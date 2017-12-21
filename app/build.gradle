@@ -1,0 +1,61 @@
+apply plugin: 'com.android.application'
+
+android {
+    compileSdkVersion 24
+    buildToolsVersion "24.0.2"
+    defaultConfig {
+        applicationId "qiyi.zujianhua"
+        minSdkVersion 14
+        targetSdkVersion 24
+        versionCode 1
+        versionName "1.0"
+        testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+    }
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+        }
+    }
+
+    sourceSets {
+        main {
+            manifest.srcFile 'AndroidManifest.xml'
+            java.srcDirs = ['src']
+            resources.srcDirs = ['src']
+            aidl.srcDirs = ['src']
+            renderscript.srcDirs = ['src']
+            res.srcDirs = ['res']
+            assets.srcDirs = ['assets']
+            jniLibs.srcDirs = ['libs']
+        }
+    }
+
+}
+
+dependencies {
+    compile fileTree(dir: 'libs', include: ['*.jar'])
+
+}
+
+afterEvaluate {
+    tasks['assembleRelease'].doLast{
+        copyReleaseOutputs.execute()
+        println "date ---"+dateStemp
+    }
+}
+
+//打包后复制到build-output 目录apk.manifest.mapping
+task copyReleaseOutputs(type:Copy){
+    println '--------------------copy 动作开始-----------'
+    from ("$buildDir/outputs/apk/app-release-unsigned.apk") {
+        rename  'app-release-unsigned.apk','demo-base-release.apk'
+    }
+    from "$buildDir/intermediates/manifests/full/release/AndroidManifest.xml"
+    from ("$buildDir/outputs/mapping/release/mapping.txt"){
+        rename 'mapping.txt' ,'demo-base-mapping.txt'
+    }
+
+    into new File(rootDir,'build-outputs')
+    println '--------------------copy 结束-----------'
+}
